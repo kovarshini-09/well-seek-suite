@@ -1,0 +1,231 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useApp } from "@/context/app-context";
+import { CalendarDays, CheckCircle, XCircle, LogOut, ShieldCheck, Plus, Trash2, Users, Stethoscope, ClipboardList } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { specialties } from "@/lib/data";
+
+type Tab = "home" | "all-doctors" | "add-doctor" | "all-services" | "add-service";
+
+export default function AdminDashboard() {
+  const navigate = useNavigate();
+  const { userRole, user, logout, appointments, allDoctors, addDoctor, removeDoctor, allServices, addService, removeService } = useApp();
+  const [activeTab, setActiveTab] = useState<Tab>("home");
+
+  useEffect(() => {
+    if (userRole !== "admin") navigate("/staff-login");
+  }, [userRole, navigate]);
+
+  if (userRole !== "admin") return null;
+
+  const totalAppointments = appointments.length;
+  const approved = appointments.filter((a) => a.status === "upcoming" || a.status === "completed").length;
+  const cancelled = appointments.filter((a) => a.status === "cancelled").length;
+
+  const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
+    { key: "home", label: "Home", icon: <ShieldCheck className="h-4 w-4" /> },
+    { key: "all-doctors", label: "All Doctors", icon: <Users className="h-4 w-4" /> },
+    { key: "add-doctor", label: "Add Doctor", icon: <Stethoscope className="h-4 w-4" /> },
+    { key: "all-services", label: "All Services", icon: <ClipboardList className="h-4 w-4" /> },
+    { key: "add-service", label: "Add Service", icon: <Plus className="h-4 w-4" /> },
+  ];
+
+  return (
+    <div className="min-h-screen bg-muted/30">
+      <header className="sticky top-0 z-50 border-b border-border bg-background">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="h-6 w-6 text-primary" />
+            <h1 className="text-lg font-bold text-foreground">Admin Dashboard</h1>
+          </div>
+          <button onClick={() => { logout(); navigate("/"); }} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-destructive">
+            <LogOut className="h-4 w-4" /> Logout
+          </button>
+        </div>
+        {/* Horizontal Nav */}
+        <div className="border-t border-border bg-background">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex gap-1 overflow-x-auto">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`flex items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
+                    activeTab === tab.key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {tab.icon} {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {activeTab === "home" && <HomeTab totalAppointments={totalAppointments} approved={approved} cancelled={cancelled} />}
+        {activeTab === "all-doctors" && <AllDoctorsTab doctors={allDoctors} onRemove={removeDoctor} />}
+        {activeTab === "add-doctor" && <AddDoctorTab onAdd={addDoctor} onDone={() => setActiveTab("all-doctors")} />}
+        {activeTab === "all-services" && <AllServicesTab services={allServices} onRemove={removeService} />}
+        {activeTab === "add-service" && <AddServiceTab onAdd={addService} onDone={() => setActiveTab("all-services")} />}
+      </div>
+    </div>
+  );
+}
+
+function HomeTab({ totalAppointments, approved, cancelled }: { totalAppointments: number; approved: number; cancelled: number }) {
+  return (
+    <div className="grid gap-6 sm:grid-cols-3">
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10"><CalendarDays className="h-6 w-6 text-primary" /></div>
+          <div><p className="text-sm text-muted-foreground">Total Appointments</p><p className="text-2xl font-bold text-foreground">{totalAppointments}</p></div>
+        </div>
+      </div>
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-success/10"><CheckCircle className="h-6 w-6 text-success" /></div>
+          <div><p className="text-sm text-muted-foreground">Approved</p><p className="text-2xl font-bold text-foreground">{approved}</p></div>
+        </div>
+      </div>
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10"><XCircle className="h-6 w-6 text-destructive" /></div>
+          <div><p className="text-sm text-muted-foreground">Cancelled</p><p className="text-2xl font-bold text-foreground">{cancelled}</p></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AllDoctorsTab({ doctors, onRemove }: { doctors: any[]; onRemove: (id: string) => void }) {
+  return (
+    <div>
+      <h2 className="mb-6 text-xl font-bold text-foreground">All Doctors ({doctors.length})</h2>
+      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {doctors.map((doc) => (
+          <div key={doc.id} className="overflow-hidden rounded-xl border border-border bg-card">
+            <div className="h-48 overflow-hidden bg-secondary">
+              <img src={doc.image} alt={doc.name} className="h-full w-full object-cover" />
+            </div>
+            <div className="p-4">
+              <h3 className="font-semibold text-foreground">{doc.name}</h3>
+              <p className="text-sm text-muted-foreground">{doc.specialty}</p>
+              <p className="text-sm text-muted-foreground">{doc.degree} • {doc.experience}</p>
+              <p className="text-sm text-muted-foreground">₹{doc.fees}/visit</p>
+              <p className="text-xs text-muted-foreground mt-1">{doc.email}</p>
+              <Button variant="outline" size="sm" onClick={() => onRemove(doc.id)} className="mt-3 w-full text-destructive hover:bg-destructive/10">
+                <Trash2 className="mr-1 h-3 w-3" /> Remove
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AddDoctorTab({ onAdd, onDone }: { onAdd: (doc: any) => void; onDone: () => void }) {
+  const [form, setForm] = useState({
+    name: "", email: "", specialty: "General physician", salary: "", address: "", phone: "", age: "", gender: "Male", fees: "", degree: "MBBS", experience: "1 Year", about: "", image: "https://randomuser.me/api/portraits/men/1.jpg",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onAdd({
+      ...form,
+      fees: Number(form.fees) || 500,
+      salary: Number(form.salary) || 50000,
+      age: Number(form.age) || 30,
+      available: true,
+      address: { line1: form.address, line2: "" },
+    });
+    onDone();
+  };
+
+  return (
+    <div className="mx-auto max-w-2xl">
+      <h2 className="mb-6 text-xl font-bold text-foreground">Add New Doctor</h2>
+      <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div><Label>Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
+          <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /></div>
+          <div><Label>Department</Label>
+            <Select value={form.specialty} onValueChange={(v) => setForm({ ...form, specialty: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>{specialties.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div><Label>Degree</Label><Input value={form.degree} onChange={(e) => setForm({ ...form, degree: e.target.value })} /></div>
+          <div><Label>Experience</Label><Input value={form.experience} onChange={(e) => setForm({ ...form, experience: e.target.value })} /></div>
+          <div><Label>Fees (₹)</Label><Input type="number" value={form.fees} onChange={(e) => setForm({ ...form, fees: e.target.value })} required /></div>
+          <div><Label>Salary (₹)</Label><Input type="number" value={form.salary} onChange={(e) => setForm({ ...form, salary: e.target.value })} /></div>
+          <div><Label>Phone</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+          <div><Label>Age</Label><Input type="number" value={form.age} onChange={(e) => setForm({ ...form, age: e.target.value })} /></div>
+          <div><Label>Gender</Label>
+            <Select value={form.gender} onValueChange={(v) => setForm({ ...form, gender: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent><SelectItem value="Male">Male</SelectItem><SelectItem value="Female">Female</SelectItem><SelectItem value="Other">Other</SelectItem></SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div><Label>Address</Label><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
+        <div><Label>About</Label><Input value={form.about} onChange={(e) => setForm({ ...form, about: e.target.value })} /></div>
+        <div><Label>Image URL</Label><Input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} /></div>
+        <Button type="submit" className="w-full rounded-full">Add Doctor</Button>
+      </form>
+    </div>
+  );
+}
+
+function AllServicesTab({ services, onRemove }: { services: any[]; onRemove: (id: string) => void }) {
+  return (
+    <div>
+      <h2 className="mb-6 text-xl font-bold text-foreground">All Services ({services.length})</h2>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {services.map((srv) => (
+          <div key={srv.id} className="overflow-hidden rounded-xl border border-border bg-card">
+            <div className="h-40 overflow-hidden"><img src={srv.image} alt={srv.name} className="h-full w-full object-cover" /></div>
+            <div className="p-4">
+              <h3 className="font-semibold text-foreground">{srv.name}</h3>
+              <p className="text-sm text-muted-foreground line-clamp-2">{srv.description}</p>
+              <p className="mt-2 text-sm font-semibold text-foreground">₹{srv.price} • {srv.duration}</p>
+              <Button variant="outline" size="sm" onClick={() => onRemove(srv.id)} className="mt-3 w-full text-destructive hover:bg-destructive/10">
+                <Trash2 className="mr-1 h-3 w-3" /> Remove
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AddServiceTab({ onAdd, onDone }: { onAdd: (srv: any) => void; onDone: () => void }) {
+  const [form, setForm] = useState({ name: "", description: "", price: "", duration: "", image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=300&fit=crop" });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onAdd({ ...form, price: Number(form.price) || 100, available: true });
+    onDone();
+  };
+
+  return (
+    <div className="mx-auto max-w-2xl">
+      <h2 className="mb-6 text-xl font-bold text-foreground">Add New Service</h2>
+      <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6">
+        <div><Label>Service Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
+        <div><Label>Description</Label><Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required /></div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div><Label>Price (₹)</Label><Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required /></div>
+          <div><Label>Duration</Label><Input placeholder="e.g. 30 mins" value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} required /></div>
+        </div>
+        <div><Label>Image URL</Label><Input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} /></div>
+        <Button type="submit" className="w-full rounded-full">Add Service</Button>
+      </form>
+    </div>
+  );
+}
