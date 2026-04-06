@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "@/context/app-context";
-import { CalendarDays, CheckCircle, XCircle, LogOut, ShieldCheck, Plus, Trash2, Users, Stethoscope, ClipboardList } from "lucide-react";
+import { CalendarDays, CheckCircle, XCircle, LogOut, ShieldCheck, Plus, Trash2, Users, Stethoscope, ClipboardList, TrendingUp, Activity, UserCheck, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,7 +45,6 @@ export default function AdminDashboard() {
             <LogOut className="h-4 w-4" /> Logout
           </button>
         </div>
-        {/* Horizontal Nav */}
         <div className="border-t border-border bg-background">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex gap-1 overflow-x-auto">
@@ -66,7 +65,7 @@ export default function AdminDashboard() {
       </header>
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {activeTab === "home" && <HomeTab totalAppointments={totalAppointments} approved={approved} cancelled={cancelled} />}
+        {activeTab === "home" && <HomeTab totalAppointments={totalAppointments} approved={approved} cancelled={cancelled} appointments={appointments} allDoctors={allDoctors} allServices={allServices} />}
         {activeTab === "all-doctors" && <AllDoctorsTab doctors={allDoctors} onRemove={removeDoctor} />}
         {activeTab === "add-doctor" && <AddDoctorTab onAdd={addDoctor} onDone={() => setActiveTab("all-doctors")} />}
         {activeTab === "all-services" && <AllServicesTab services={allServices} onRemove={removeService} />}
@@ -76,26 +75,123 @@ export default function AdminDashboard() {
   );
 }
 
-function HomeTab({ totalAppointments, approved, cancelled }: { totalAppointments: number; approved: number; cancelled: number }) {
+function HomeTab({ totalAppointments, approved, cancelled, appointments, allDoctors, allServices }: { totalAppointments: number; approved: number; cancelled: number; appointments: any[]; allDoctors: any[]; allServices: any[] }) {
+  const completedAppointments = appointments.filter((a: any) => a.status === "completed");
+  const totalRevenue = completedAppointments.reduce((sum: number, a: any) => sum + a.doctor.fees, 0);
+  
+  // Get recent appointments
+  const recentAppointments = [...appointments].reverse().slice(0, 5);
+
+  // Get specialty distribution
+  const specialtyCount: Record<string, number> = {};
+  allDoctors.forEach((doc: any) => {
+    specialtyCount[doc.specialty] = (specialtyCount[doc.specialty] || 0) + 1;
+  });
+
   return (
-    <div className="grid gap-6 sm:grid-cols-3">
-      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10"><CalendarDays className="h-6 w-6 text-primary" /></div>
-          <div><p className="text-sm text-muted-foreground">Total Appointments</p><p className="text-2xl font-bold text-foreground">{totalAppointments}</p></div>
+    <div className="space-y-8">
+      {/* Stats Cards */}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10"><CalendarDays className="h-6 w-6 text-primary" /></div>
+            <div><p className="text-sm text-muted-foreground">Total Appointments</p><p className="text-2xl font-bold text-foreground">{totalAppointments}</p></div>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-success/10"><CheckCircle className="h-6 w-6 text-success" /></div>
+            <div><p className="text-sm text-muted-foreground">Approved</p><p className="text-2xl font-bold text-foreground">{approved}</p></div>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10"><XCircle className="h-6 w-6 text-destructive" /></div>
+            <div><p className="text-sm text-muted-foreground">Cancelled</p><p className="text-2xl font-bold text-foreground">{cancelled}</p></div>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-warning/10"><TrendingUp className="h-6 w-6 text-warning" /></div>
+            <div><p className="text-sm text-muted-foreground">Total Revenue</p><p className="text-2xl font-bold text-foreground">₹{totalRevenue}</p></div>
+          </div>
         </div>
       </div>
-      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-success/10"><CheckCircle className="h-6 w-6 text-success" /></div>
-          <div><p className="text-sm text-muted-foreground">Approved</p><p className="text-2xl font-bold text-foreground">{approved}</p></div>
+
+      {/* Overview Cards */}
+      <div className="grid gap-6 sm:grid-cols-3">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <Users className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold text-foreground">Total Doctors</h3>
+          </div>
+          <p className="text-3xl font-bold text-foreground">{allDoctors.length}</p>
+          <p className="text-sm text-muted-foreground mt-1">Active doctors on platform</p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <Activity className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold text-foreground">Total Services</h3>
+          </div>
+          <p className="text-3xl font-bold text-foreground">{allServices.length}</p>
+          <p className="text-sm text-muted-foreground mt-1">Available health services</p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <UserCheck className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold text-foreground">Completion Rate</h3>
+          </div>
+          <p className="text-3xl font-bold text-foreground">
+            {totalAppointments > 0 ? Math.round((completedAppointments.length / totalAppointments) * 100) : 0}%
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">Appointments completed</p>
         </div>
       </div>
+
+      {/* Doctor Specialty Distribution */}
       <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10"><XCircle className="h-6 w-6 text-destructive" /></div>
-          <div><p className="text-sm text-muted-foreground">Cancelled</p><p className="text-2xl font-bold text-foreground">{cancelled}</p></div>
+        <h3 className="mb-4 text-lg font-semibold text-foreground">Doctors by Specialty</h3>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {Object.entries(specialtyCount).map(([specialty, count]) => (
+            <div key={specialty} className="flex items-center justify-between rounded-xl bg-secondary/50 p-4">
+              <span className="text-sm font-medium text-foreground">{specialty}</span>
+              <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-bold text-primary">{count}</span>
+            </div>
+          ))}
         </div>
+      </div>
+
+      {/* Recent Appointments */}
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <h3 className="mb-4 text-lg font-semibold text-foreground">Recent Appointments</h3>
+        {recentAppointments.length === 0 ? (
+          <p className="text-muted-foreground text-center py-8">No appointments yet</p>
+        ) : (
+          <div className="space-y-3">
+            {recentAppointments.map((apt: any) => (
+              <div key={apt.id} className="flex items-center justify-between rounded-xl bg-secondary/30 p-4">
+                <div className="flex items-center gap-3">
+                  <img src={apt.doctor.image} alt={apt.doctor.name} className="h-10 w-10 rounded-full object-cover" />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{apt.patientName || "Patient"}</p>
+                    <p className="text-xs text-muted-foreground">{apt.doctor.name} • {apt.doctor.specialty}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                    apt.status === "completed" ? "bg-green-100 text-green-700" :
+                    apt.status === "cancelled" ? "bg-red-100 text-red-700" :
+                    apt.status === "pending" ? "bg-yellow-100 text-yellow-700" :
+                    "bg-blue-100 text-blue-700"
+                  }`}>
+                    {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
+                  </span>
+                  <p className="mt-1 text-xs text-muted-foreground">{new Date(apt.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -130,11 +226,30 @@ function AllDoctorsTab({ doctors, onRemove }: { doctors: any[]; onRemove: (id: s
 
 function AddDoctorTab({ onAdd, onDone }: { onAdd: (doc: any) => void; onDone: () => void }) {
   const [form, setForm] = useState({
-    name: "", email: "", specialty: "General physician", salary: "", address: "", phone: "", age: "", gender: "Male", fees: "", degree: "MBBS", experience: "1 Year", about: "", image: "https://randomuser.me/api/portraits/men/1.jpg",
+    name: "", email: "", specialty: "General physician", salary: "", address: "", phone: "", age: "", gender: "Male", fees: "", degree: "MBBS", experience: "1 Year", about: "", image: "",
   });
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setImagePreview(result);
+        setForm({ ...form, image: result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.image) {
+      alert("Please upload a photo of the doctor");
+      return;
+    }
     onAdd({
       ...form,
       fees: Number(form.fees) || 500,
@@ -150,6 +265,28 @@ function AddDoctorTab({ onAdd, onDone }: { onAdd: (doc: any) => void; onDone: ()
     <div className="mx-auto max-w-2xl">
       <h2 className="mb-6 text-xl font-bold text-foreground">Add New Doctor</h2>
       <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6">
+        {/* Photo Upload */}
+        <div>
+          <Label>Doctor Photo *</Label>
+          <div className="mt-2 flex items-center gap-4">
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="flex h-32 w-32 cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border bg-secondary/50 transition-colors hover:border-primary"
+            >
+              {imagePreview ? (
+                <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+              ) : (
+                <div className="text-center">
+                  <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+                  <p className="mt-1 text-xs text-muted-foreground">Upload Photo</p>
+                </div>
+              )}
+            </div>
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+            <p className="text-sm text-muted-foreground">Click to upload doctor's photo. JPG, PNG supported.</p>
+          </div>
+        </div>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <div><Label>Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
           <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /></div>
@@ -174,7 +311,6 @@ function AddDoctorTab({ onAdd, onDone }: { onAdd: (doc: any) => void; onDone: ()
         </div>
         <div><Label>Address</Label><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
         <div><Label>About</Label><Input value={form.about} onChange={(e) => setForm({ ...form, about: e.target.value })} /></div>
-        <div><Label>Image URL</Label><Input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} /></div>
         <Button type="submit" className="w-full rounded-full">Add Doctor</Button>
       </form>
     </div>
@@ -205,10 +341,29 @@ function AllServicesTab({ services, onRemove }: { services: any[]; onRemove: (id
 }
 
 function AddServiceTab({ onAdd, onDone }: { onAdd: (srv: any) => void; onDone: () => void }) {
-  const [form, setForm] = useState({ name: "", description: "", price: "", duration: "", image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&h=300&fit=crop" });
+  const [form, setForm] = useState({ name: "", description: "", price: "", duration: "", image: "" });
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setImagePreview(result);
+        setForm({ ...form, image: result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.image) {
+      alert("Please upload an image for the service");
+      return;
+    }
     onAdd({ ...form, price: Number(form.price) || 100, available: true });
     onDone();
   };
@@ -217,13 +372,34 @@ function AddServiceTab({ onAdd, onDone }: { onAdd: (srv: any) => void; onDone: (
     <div className="mx-auto max-w-2xl">
       <h2 className="mb-6 text-xl font-bold text-foreground">Add New Service</h2>
       <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6">
+        {/* Image Upload */}
+        <div>
+          <Label>Service Image *</Label>
+          <div className="mt-2 flex items-center gap-4">
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="flex h-32 w-48 cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border bg-secondary/50 transition-colors hover:border-primary"
+            >
+              {imagePreview ? (
+                <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+              ) : (
+                <div className="text-center">
+                  <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+                  <p className="mt-1 text-xs text-muted-foreground">Upload Image</p>
+                </div>
+              )}
+            </div>
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+            <p className="text-sm text-muted-foreground">Click to upload service image. JPG, PNG supported.</p>
+          </div>
+        </div>
+
         <div><Label>Service Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
         <div><Label>Description</Label><Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required /></div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div><Label>Price (₹)</Label><Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required /></div>
           <div><Label>Duration</Label><Input placeholder="e.g. 30 mins" value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} required /></div>
         </div>
-        <div><Label>Image URL</Label><Input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} /></div>
         <Button type="submit" className="w-full rounded-full">Add Service</Button>
       </form>
     </div>
