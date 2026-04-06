@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 export default function ContactPage() {
@@ -12,7 +11,12 @@ export default function ContactPage() {
         <div className="space-y-8">
           <div>
             <h3 className="mb-4 text-lg font-semibold text-muted-foreground">OUR OFFICE</h3>
-            <div className="space-y-2 text-muted-foreground"><p>00000 Willms Station</p><p>Suite 000, Washington, USA</p><p className="mt-4">Tel: (000) 000-0000</p><p>Email: contact@prescripto.com</p></div>
+            <div className="space-y-2 text-muted-foreground">
+              <p>No. 42, 3rd Floor, Greams Road</p>
+              <p>Thousand Lights, Chennai, Tamil Nadu 600006</p>
+              <p className="mt-4">Tel: +91 44 2829 0000</p>
+              <p>Email: contact@prescripto.com</p>
+            </div>
           </div>
           <div>
             <h3 className="mb-4 text-lg font-semibold text-muted-foreground">CAREERS AT PRESCRIPTO</h3>

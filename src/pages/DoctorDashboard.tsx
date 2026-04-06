@@ -1,8 +1,15 @@
 import { useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useApp } from "@/context/app-context";
 import { CalendarDays, CheckCircle, XCircle, IndianRupee, LogOut, Stethoscope } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const statusColors: Record<string, string> = {
+  upcoming: "bg-blue-100 text-blue-700 border-blue-200",
+  pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  completed: "bg-green-100 text-green-700 border-green-200",
+  cancelled: "bg-red-100 text-red-700 border-red-200",
+};
 
 export default function DoctorDashboard() {
   const navigate = useNavigate();
@@ -98,17 +105,22 @@ export default function DoctorDashboard() {
                   <div className="flex items-center gap-2">
                     <p className="text-sm text-muted-foreground">₹{apt.doctor.fees}</p>
                   </div>
-                  <Select value={apt.status} onValueChange={(v) => handleStatusChange(apt.id, v)}>
-                    <SelectTrigger className="w-36">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="upcoming">Upcoming</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-3">
+                    <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${statusColors[apt.status] || ""}`}>
+                      {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
+                    </span>
+                    <Select value={apt.status} onValueChange={(v) => handleStatusChange(apt.id, v)}>
+                      <SelectTrigger className="w-36">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="upcoming">Upcoming</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               ))}
             </div>

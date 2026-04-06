@@ -13,9 +13,9 @@ export function Hero() {
             </h1>
             <div className="flex items-start gap-3">
               <div className="flex -space-x-2">
-                <div className="h-10 w-10 rounded-full border-2 border-primary-foreground bg-secondary" />
-                <div className="h-10 w-10 rounded-full border-2 border-primary-foreground bg-secondary" />
-                <div className="h-10 w-10 rounded-full border-2 border-primary-foreground bg-secondary" />
+                <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=80&h=80&fit=crop&crop=face" alt="Doctor 1" className="h-10 w-10 rounded-full border-2 border-primary-foreground object-cover" />
+                <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=80&h=80&fit=crop&crop=face" alt="Doctor 2" className="h-10 w-10 rounded-full border-2 border-primary-foreground object-cover" />
+                <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=80&h=80&fit=crop&crop=face" alt="Doctor 3" className="h-10 w-10 rounded-full border-2 border-primary-foreground object-cover" />
               </div>
               <p className="text-sm leading-relaxed opacity-90">
                 Simply browse through our extensive list of trusted doctors,
@@ -32,7 +32,7 @@ export function Hero() {
             </div>
           </div>
           <div className="relative hidden h-full md:flex md:items-end md:justify-center">
-            <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=500&h=400&fit=crop" alt="Group of doctors" className="h-80 object-contain" />
+            <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=500&h=500&fit=crop" alt="Professional doctor with stethoscope" className="h-80 object-contain" />
           </div>
         </div>
       </div>
