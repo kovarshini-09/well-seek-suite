@@ -144,7 +144,7 @@ export function AppProvider({ children }) {
     }
   };
 
-  const addService = (service: object) => {
+  const addService = (service) => {
     const newService = { ...service, id: `srv-${Date.now()}` };
     setAllServices((prev) => [...prev, newService]);
   };
