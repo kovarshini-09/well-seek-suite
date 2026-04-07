@@ -17,7 +17,7 @@ const FormField = <
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
   ...props
-}: ControllerProps<TFieldValues, TName>) => {
+}<TFieldValues, TName>) => {
   return (
     <FormFieldContext.Provider value={{ name: props.name }}>
       <Controller {...props} />
@@ -63,16 +63,14 @@ const FormItem = React.forwardRef((
 );
 FormItem.displayName = "FormItem";
 
-const FormLabel = React.forwardRef,
-  React.ComponentPropsWithoutRef
->(({ className, ...props }, ref) => {
+const FormLabel = React.forwardRef(({ className, ...props }, ref) => {
   const { error, formItemId } = useFormField();
 
   return <Label ref={ref} className={cn(error && "text-destructive", className)} htmlFor={formItemId} {...props} />;
 });
 FormLabel.displayName = "FormLabel";
 
-const FormControl = React.forwardRef, React.ComponentPropsWithoutRef>(
+const FormControl = React.forwardRef(
   ({ ...props }, ref) => {
     const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
 

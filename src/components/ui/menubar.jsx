@@ -14,9 +14,7 @@ const MenubarSub = MenubarPrimitive.Sub;
 
 const MenubarRadioGroup = MenubarPrimitive.RadioGroup;
 
-const Menubar = React.forwardRef,
-  React.ComponentPropsWithoutRef
->(({ className, ...props }, ref) => (
+const Menubar = React.forwardRef(({ className, ...props }, ref) => (
   <MenubarPrimitive.Root
     ref={ref}
     className={cn("flex h-10 items-center space-x-1 rounded-md border bg-background p-1", className)}
@@ -25,9 +23,7 @@ const Menubar = React.forwardRef,
 ));
 Menubar.displayName = MenubarPrimitive.Root.displayName;
 
-const MenubarTrigger = React.forwardRef,
-  React.ComponentPropsWithoutRef
->(({ className, ...props }, ref) => (
+const MenubarTrigger = React.forwardRef(({ className, ...props }, ref) => (
   <MenubarPrimitive.Trigger
     ref={ref}
     className={cn(
@@ -39,8 +35,7 @@ const MenubarTrigger = React.forwardRef,
 ));
 MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName;
 
-const MenubarSubTrigger = React.forwardRef,
-  React.ComponentPropsWithoutRef & {
+const MenubarSubTrigger = React.forwardRef,& {
     inset?;
   }
 >(({ className, inset, children, ...props }, ref) => (
@@ -59,9 +54,7 @@ const MenubarSubTrigger = React.forwardRef,
 ));
 MenubarSubTrigger.displayName = MenubarPrimitive.SubTrigger.displayName;
 
-const MenubarSubContent = React.forwardRef,
-  React.ComponentPropsWithoutRef
->(({ className, ...props }, ref) => (
+const MenubarSubContent = React.forwardRef(({ className, ...props }, ref) => (
   <MenubarPrimitive.SubContent
     ref={ref}
     className={cn(
@@ -73,9 +66,7 @@ const MenubarSubContent = React.forwardRef,
 ));
 MenubarSubContent.displayName = MenubarPrimitive.SubContent.displayName;
 
-const MenubarContent = React.forwardRef,
-  React.ComponentPropsWithoutRef
->(({ className, align = "start", alignOffset = -4, sideOffset = 8, ...props }, ref) => (
+const MenubarContent = React.forwardRef(({ className, align = "start", alignOffset = -4, sideOffset = 8, ...props }, ref) => (
   <MenubarPrimitive.Portal>
     <MenubarPrimitive.Content
       ref={ref}
@@ -92,8 +83,7 @@ const MenubarContent = React.forwardRef,
 ));
 MenubarContent.displayName = MenubarPrimitive.Content.displayName;
 
-const MenubarItem = React.forwardRef,
-  React.ComponentPropsWithoutRef & {
+const MenubarItem = React.forwardRef,& {
     inset?;
   }
 >(({ className, inset, ...props }, ref) => (
@@ -109,9 +99,7 @@ const MenubarItem = React.forwardRef,
 ));
 MenubarItem.displayName = MenubarPrimitive.Item.displayName;
 
-const MenubarCheckboxItem = React.forwardRef,
-  React.ComponentPropsWithoutRef
->(({ className, children, checked, ...props }, ref) => (
+const MenubarCheckboxItem = React.forwardRef(({ className, children, checked, ...props }, ref) => (
   <MenubarPrimitive.CheckboxItem
     ref={ref}
     className={cn(
@@ -131,9 +119,7 @@ const MenubarCheckboxItem = React.forwardRef,
 ));
 MenubarCheckboxItem.displayName = MenubarPrimitive.CheckboxItem.displayName;
 
-const MenubarRadioItem = React.forwardRef,
-  React.ComponentPropsWithoutRef
->(({ className, children, ...props }, ref) => (
+const MenubarRadioItem = React.forwardRef(({ className, children, ...props }, ref) => (
   <MenubarPrimitive.RadioItem
     ref={ref}
     className={cn(
@@ -152,8 +138,7 @@ const MenubarRadioItem = React.forwardRef,
 ));
 MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName;
 
-const MenubarLabel = React.forwardRef,
-  React.ComponentPropsWithoutRef & {
+const MenubarLabel = React.forwardRef,& {
     inset?;
   }
 >(({ className, inset, ...props }, ref) => (
@@ -165,9 +150,7 @@ const MenubarLabel = React.forwardRef,
 ));
 MenubarLabel.displayName = MenubarPrimitive.Label.displayName;
 
-const MenubarSeparator = React.forwardRef,
-  React.ComponentPropsWithoutRef
->(({ className, ...props }, ref) => (
+const MenubarSeparator = React.forwardRef(({ className, ...props }, ref) => (
   <MenubarPrimitive.Separator ref={ref} className={cn("-mx-1 my-1 h-px bg-muted", className)} {...props} />
 ));
 MenubarSeparator.displayName = MenubarPrimitive.Separator.displayName;

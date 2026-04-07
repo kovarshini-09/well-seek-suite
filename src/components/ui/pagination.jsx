@@ -29,7 +29,7 @@ PaginationItem.displayName = "PaginationItem";
 & Pick<ButtonProps, "size"> &
   React.ComponentProps;
 
-const PaginationLink = ({ className, isActive, size = "icon", ...props }: PaginationLinkProps) => (
+const PaginationLink = ({ className, isActive, size = "icon", ...props }) => (
   <a
     aria-current={isActive ? "page" : undefined}
     className={cn(
