@@ -23,7 +23,7 @@ export default function MyAppointmentsPage() {
   const cancelledServices = serviceBookings.filter((s) => s.status === "cancelled");
 
   // Real-time queue: count how many people booked the same doctor on the same date/time slot before this patient
-  const getQueueInfo = (apt: typeof appointments[0]) => {
+  const getQueueInfo = (apt) => {
     const sameSlotAppointments = appointments.filter(
       (a) => a.doctor.id === apt.doctor.id && a.date === apt.date && a.time === apt.time && a.status !== "cancelled"
     );
@@ -36,7 +36,7 @@ export default function MyAppointmentsPage() {
   };
 
   // Real-time queue for services
-  const getServiceQueueInfo = (booking: typeof serviceBookings[0]) => {
+  const getServiceQueueInfo = (booking) => {
     const sameSlotBookings = serviceBookings.filter(
       (b) => b.service.id === booking.service.id && b.date === booking.date && b.time === booking.time && b.status !== "cancelled"
     );
