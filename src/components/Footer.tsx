@@ -28,8 +28,10 @@ export function Footer() {
           <div>
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground">Get in Touch</h3>
             <ul className="space-y-3">
-              <li className="text-sm text-muted-foreground">+1-000-000-0000</li>
-              <li className="text-sm text-muted-foreground">contact@prescripto.com</li>
+              <li className="text-sm text-muted-foreground">+91 44 2817 0000</li>
+              <li className="text-sm text-muted-foreground">contact@prescripto.in</li>
+              <li className="text-sm text-muted-foreground">No. 57, Anna Salai, Guindy</li>
+              <li className="text-sm text-muted-foreground">Chennai, Tamil Nadu 600032, India</li>
             </ul>
           </div>
         </div>

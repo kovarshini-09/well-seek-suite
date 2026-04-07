@@ -27,9 +27,12 @@ type AppContextType = {
   allDoctors: Doctor[];
   addDoctor: (doctor: Omit<Doctor, "id">) => void;
   removeDoctor: (id: string) => void;
+  toggleDoctorAvailability: (id: string) => void;
+  updateDoctor: (id: string, updates: Partial<Doctor>) => void;
   allServices: Service[];
   addService: (service: Omit<Service, "id">) => void;
   removeService: (id: string) => void;
+  toggleServiceAvailability: (id: string) => void;
   getDoctorEarnings: (doctorId: string) => number;
   getDoctorAppointments: (doctorId: string) => Appointment[];
 };
@@ -52,7 +55,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         name: "Edward Vincent",
         email,
         phone: "+91 234 567 8900",
-        address: "57th Cross, Richmond Circle, Church Road, London",
+        address: "57th Cross, Richmond Circle, Church Road, Chennai",
         gender: "Male",
         birthday: "20 July 1996",
         image: "",
@@ -167,6 +170,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setAllDoctors((prev) => prev.filter((d) => d.id !== id));
   };
 
+  const toggleDoctorAvailability = (id: string) => {
+    setAllDoctors((prev) => prev.map((d) => (d.id === id ? { ...d, available: !d.available } : d)));
+  };
+
+  const updateDoctor = (id: string, updates: Partial<Doctor>) => {
+    setAllDoctors((prev) => prev.map((d) => (d.id === id ? { ...d, ...updates } : d)));
+    if (loggedInDoctor && loggedInDoctor.id === id) {
+      setLoggedInDoctor((prev) => prev ? { ...prev, ...updates } : prev);
+    }
+  };
+
   const addService = (service: Omit<Service, "id">) => {
     const newService = { ...service, id: `srv-${Date.now()}` } as Service;
     setAllServices((prev) => [...prev, newService]);
@@ -174,6 +188,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const removeService = (id: string) => {
     setAllServices((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  const toggleServiceAvailability = (id: string) => {
+    setAllServices((prev) => prev.map((s) => (s.id === id ? { ...s, available: !s.available } : s)));
   };
 
   const getDoctorEarnings = (doctorId: string) => {
@@ -193,8 +211,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         login, loginAsDoctor, loginAsAdmin, logout, register,
         appointments, bookAppointment, cancelAppointment, updateAppointmentStatus,
         serviceBookings, bookService, cancelServiceBooking,
-        allDoctors, addDoctor, removeDoctor,
-        allServices, addService, removeService,
+        allDoctors, addDoctor, removeDoctor, toggleDoctorAvailability, updateDoctor,
+        allServices, addService, removeService, toggleServiceAvailability,
         getDoctorEarnings, getDoctorAppointments,
       }}
     >
