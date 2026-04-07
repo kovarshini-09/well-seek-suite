@@ -50,8 +50,7 @@ const useFormField = () => {
 
 const FormItemContext = React.createContext({});
 
-const FormItem = React.forwardRef((
-  ({ className, ...props }, ref) => {
+const FormItem = React.forwardRef(({ className, ...props }, ref) => {
     const id = React.useId();
 
     return (
@@ -59,8 +58,8 @@ const FormItem = React.forwardRef((
         <div ref={ref} className={cn("space-y-2", className)} {...props} />
       </FormItemContext.Provider>
     );
-  },
-);
+  });
+
 FormItem.displayName = "FormItem";
 
 const FormLabel = React.forwardRef(({ className, ...props }, ref) => {
@@ -83,21 +82,19 @@ const FormControl = React.forwardRef(
         {...props}
       />
     );
-  },
-);
+  });
+
 FormControl.displayName = "FormControl";
 
-const FormDescription = React.forwardRef((
-  ({ className, ...props }, ref) => {
+const FormDescription = React.forwardRef(({ className, ...props }, ref) => {
     const { formDescriptionId } = useFormField();
 
     return <p ref={ref} id={formDescriptionId} className={cn("text-sm text-muted-foreground", className)} {...props} />;
-  },
-);
+  });
+
 FormDescription.displayName = "FormDescription";
 
-const FormMessage = React.forwardRef((
-  ({ className, children, ...props }, ref) => {
+const FormMessage = React.forwardRef(({ className, children, ...props }, ref) => {
     const { error, formMessageId } = useFormField();
     const body = error ? String(error?.message) : children;
 
@@ -110,8 +107,8 @@ const FormMessage = React.forwardRef((
         {body}
       </p>
     );
-  },
-);
+  });
+
 FormMessage.displayName = "FormMessage";
 
 export { useFormField, Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormField };
