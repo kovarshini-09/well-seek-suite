@@ -124,7 +124,7 @@ export function AppProvider({ children }) {
     setServiceBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status: "cancelled" } : b)));
   };
 
-  const addDoctor = (doctor: object) => {
+  const addDoctor = (doctor) => {
     const newDoctor = { ...doctor, id: `doc-${Date.now()}` };
     setAllDoctors((prev) => [...prev, newDoctor]);
   };
@@ -137,7 +137,7 @@ export function AppProvider({ children }) {
     setAllDoctors((prev) => prev.map((d) => (d.id === id ? { ...d, available: !d.available } : d)));
   };
 
-  const updateDoctor = (id, updates: object) => {
+  const updateDoctor = (id, updates) => {
     setAllDoctors((prev) => prev.map((d) => (d.id === id ? { ...d, ...updates } : d)));
     if (loggedInDoctor && loggedInDoctor.id === id) {
       setLoggedInDoctor((prev) => prev ? { ...prev, ...updates } : prev);
