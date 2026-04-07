@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { doctors, services, ADMIN_CREDENTIALS } from "@/lib/data";
+import { doctors as initialDoctors, services as initialServices, ADMIN_CREDENTIALS } from "@/lib/data";
 const AppContext = createContext(undefined);
 
 export function AppProvider({ children }) {
