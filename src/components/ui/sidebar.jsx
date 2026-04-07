@@ -31,8 +31,6 @@ function useSidebar() {
 }
 
 const SidebarProvider = React.forwardRef & {
-    defaultOpen?;
-    open?;
     onOpenChange?: (open) => void;
   }
 >(({ defaultOpen = true, open: openProp, onOpenChange: setOpenProp, className, style, children, ...props }, ref) => {
@@ -197,7 +195,7 @@ const Sidebar = React.forwardRef(({ side = "left", variant = "sidebar", collapsi
 });
 Sidebar.displayName = "Sidebar";
 
-const SidebarTrigger = React.forwardRef, React.ComponentProps>(
+const SidebarTrigger = React.forwardRef(
   ({ className, onClick, ...props }, ref) => {
     const { toggleSidebar } = useSidebar();
 
@@ -264,7 +262,7 @@ const SidebarInset = React.forwardRef(({ className, ...props }, ref) => {
 });
 SidebarInset.displayName = "SidebarInset";
 
-const SidebarInput = React.forwardRef, React.ComponentProps>(
+const SidebarInput = React.forwardRef(
   ({ className, ...props }, ref) => {
     return (
       <Input
@@ -291,7 +289,7 @@ const SidebarFooter = React.forwardRef(({ className, ...props }, ref) => {
 });
 SidebarFooter.displayName = "SidebarFooter";
 
-const SidebarSeparator = React.forwardRef, React.ComponentProps>(
+const SidebarSeparator = React.forwardRef(
   ({ className, ...props }, ref) => {
     return (
       <Separator
@@ -410,12 +408,7 @@ const sidebarMenuButtonVariants = cva(
   });
 
 
-const SidebarMenuButton = React.forwardRef & {
-    asChild?;
-    isActive?;
-    tooltip?: string | React.ComponentProps;
-  }
->(({ asChild = false, isActive = false, variant = "default", size = "default", tooltip, className, ...props }, ref) => {
+const SidebarMenuButton = React.forwardRef(({ asChild = false, isActive = false, variant = "default", size = "default", tooltip, className, ...props }, ref) => {
   const Comp = asChild ? Slot : "button";
   const { isMobile, state } = useSidebar();
 

@@ -17,7 +17,6 @@ const ResizableHandle = ({
   className,
   ...props
 }: React.ComponentProps & {
-  withHandle?;
 }) => (
   <ResizablePrimitive.PanelResizeHandle
     className={cn(

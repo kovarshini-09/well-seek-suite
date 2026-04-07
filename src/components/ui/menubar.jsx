@@ -35,10 +35,7 @@ const MenubarTrigger = React.forwardRef(({ className, ...props }, ref) => (
 ));
 MenubarTrigger.displayName = MenubarPrimitive.Trigger.displayName;
 
-const MenubarSubTrigger = React.forwardRef,& {
-    inset?;
-  }
->(({ className, inset, children, ...props }, ref) => (
+const MenubarSubTrigger = React.forwardRef(({ className, inset, children, ...props }, ref) => (
   <MenubarPrimitive.SubTrigger
     ref={ref}
     className={cn(
@@ -83,10 +80,7 @@ const MenubarContent = React.forwardRef(({ className, align = "start", alignOffs
 ));
 MenubarContent.displayName = MenubarPrimitive.Content.displayName;
 
-const MenubarItem = React.forwardRef,& {
-    inset?;
-  }
->(({ className, inset, ...props }, ref) => (
+const MenubarItem = React.forwardRef(({ className, inset, ...props }, ref) => (
   <MenubarPrimitive.Item
     ref={ref}
     className={cn(
@@ -138,10 +132,7 @@ const MenubarRadioItem = React.forwardRef(({ className, children, ...props }, re
 ));
 MenubarRadioItem.displayName = MenubarPrimitive.RadioItem.displayName;
 
-const MenubarLabel = React.forwardRef,& {
-    inset?;
-  }
->(({ className, inset, ...props }, ref) => (
+const MenubarLabel = React.forwardRef(({ className, inset, ...props }, ref) => (
   <MenubarPrimitive.Label
     ref={ref}
     className={cn("px-2 py-1.5 text-sm font-semibold", inset && "pl-8", className)}
