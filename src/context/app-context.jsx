@@ -82,7 +82,7 @@ export function AppProvider({ children }) {
     return false;
   };
 
-  const bookAppointment = (doctor: Doctor, date, time) => {
+  const bookAppointment = (doctor, date, time) => {
     const newAppointment = {
       id: `apt-${Date.now()}`,
       doctor,
@@ -103,7 +103,7 @@ export function AppProvider({ children }) {
     setAppointments((prev) => prev.map((apt) => (apt.id === id ? { ...apt, status } : apt)));
   };
 
-  const bookService = (service: Service, date, time) => {
+  const bookService = (service, date, time) => {
     const currentQueue = queueCounter;
     setQueueCounter((prev) => prev + 1);
     const durationMinutes = parseInt(service.duration) || 15;
