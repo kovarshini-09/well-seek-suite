@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useApp } from "@/context/app-context";
 import { Button } from "@/components/ui/button";
-import { MapPin, Clock, IndianRupee, CheckCircle } from "lucide-react";
+import { MapPin, Clock, IndianRupee, CheckCircle, XCircle } from "lucide-react";
 
 export default function DoctorDetailPage() {
   const { id } = useParams();
@@ -45,6 +45,22 @@ export default function DoctorDetailPage() {
           <h1 className="text-2xl font-bold text-foreground">{doctor.name} <CheckCircle className="inline h-5 w-5 text-primary" /></h1>
           <p className="mt-1 text-muted-foreground">{doctor.degree} - {doctor.specialty}</p>
           <span className="mt-2 inline-block rounded-full border border-border px-3 py-1 text-xs">{doctor.experience}</span>
+
+          {/* Availability Badge */}
+          <div className="mt-3 flex items-center gap-2">
+            {doctor.available ? (
+              <>
+                <span className="h-3 w-3 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-sm font-medium text-green-600">Available for appointments</span>
+              </>
+            ) : (
+              <>
+                <XCircle className="h-4 w-4 text-red-500" />
+                <span className="text-sm font-medium text-red-500">Currently unavailable</span>
+              </>
+            )}
+          </div>
+
           <div className="mt-4">
             <h3 className="font-semibold text-foreground">About</h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{doctor.about}</p>
@@ -60,28 +76,37 @@ export default function DoctorDetailPage() {
       </div>
 
       {/* Booking */}
-      <div className="mt-8">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">Booking slots</h2>
-        <div className="flex flex-wrap gap-3">
-          {getNextDays().map((d) => (
-            <button key={d.date} onClick={() => setSelectedDate(d.date)} className={`rounded-full border px-4 py-2 text-sm transition-colors ${selectedDate === d.date ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}>
-              {d.label}
-            </button>
-          ))}
-        </div>
-        {selectedDate && (
-          <div className="mt-4 flex flex-wrap gap-3">
-            {timeSlots.map((t) => (
-              <button key={t} onClick={() => setSelectedTime(t)} className={`rounded-full border px-4 py-2 text-sm transition-colors ${selectedTime === t ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}>
-                <Clock className="mr-1 inline h-3 w-3" />{t}
+      {doctor.available ? (
+        <div className="mt-8">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">Booking slots</h2>
+          <div className="flex flex-wrap gap-3">
+            {getNextDays().map((d) => (
+              <button key={d.date} onClick={() => setSelectedDate(d.date)} className={`rounded-full border px-4 py-2 text-sm transition-colors ${selectedDate === d.date ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}>
+                {d.label}
               </button>
             ))}
           </div>
-        )}
-        <Button onClick={handleBook} disabled={!selectedDate || !selectedTime || booked} className="mt-6 rounded-full px-12">
-          {booked ? "Booked! Redirecting..." : "Book an appointment"}
-        </Button>
-      </div>
+          {selectedDate && (
+            <div className="mt-4 flex flex-wrap gap-3">
+              {timeSlots.map((t) => (
+                <button key={t} onClick={() => setSelectedTime(t)} className={`rounded-full border px-4 py-2 text-sm transition-colors ${selectedTime === t ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}>
+                  <Clock className="mr-1 inline h-3 w-3" />{t}
+                </button>
+              ))}
+            </div>
+          )}
+          <Button onClick={handleBook} disabled={!selectedDate || !selectedTime || booked} className="mt-6 rounded-full px-12">
+            {booked ? "Booked! Redirecting..." : "Book an appointment"}
+          </Button>
+        </div>
+      ) : (
+        <div className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+          <XCircle className="mx-auto h-12 w-12 text-red-400" />
+          <h3 className="mt-4 text-lg font-semibold text-red-700">Doctor Currently Unavailable</h3>
+          <p className="mt-2 text-sm text-red-600">This doctor is not accepting appointments at the moment. Please check back later or browse other available doctors.</p>
+          <Button variant="outline" onClick={() => navigate("/doctors")} className="mt-4 rounded-full">Browse Other Doctors</Button>
+        </div>
+      )}
     </div>
   );
 }

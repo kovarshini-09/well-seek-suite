@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { specialties } from "@/lib/data";
 
 type Tab = "home" | "all-doctors" | "add-doctor" | "all-services" | "add-service";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const { userRole, user, logout, appointments, allDoctors, addDoctor, removeDoctor, allServices, addService, removeService } = useApp();
+  const { userRole, user, logout, appointments, allDoctors, addDoctor, removeDoctor, toggleDoctorAvailability, allServices, addService, removeService, toggleServiceAvailability } = useApp();
   const [activeTab, setActiveTab] = useState<Tab>("home");
 
   useEffect(() => {
@@ -66,9 +67,9 @@ export default function AdminDashboard() {
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {activeTab === "home" && <HomeTab totalAppointments={totalAppointments} approved={approved} cancelled={cancelled} appointments={appointments} allDoctors={allDoctors} allServices={allServices} />}
-        {activeTab === "all-doctors" && <AllDoctorsTab doctors={allDoctors} onRemove={removeDoctor} />}
+        {activeTab === "all-doctors" && <AllDoctorsTab doctors={allDoctors} onRemove={removeDoctor} onToggleAvailability={toggleDoctorAvailability} />}
         {activeTab === "add-doctor" && <AddDoctorTab onAdd={addDoctor} onDone={() => setActiveTab("all-doctors")} />}
-        {activeTab === "all-services" && <AllServicesTab services={allServices} onRemove={removeService} />}
+        {activeTab === "all-services" && <AllServicesTab services={allServices} onRemove={removeService} onToggleAvailability={toggleServiceAvailability} />}
         {activeTab === "add-service" && <AddServiceTab onAdd={addService} onDone={() => setActiveTab("all-services")} />}
       </div>
     </div>
@@ -78,11 +79,7 @@ export default function AdminDashboard() {
 function HomeTab({ totalAppointments, approved, cancelled, appointments, allDoctors, allServices }: { totalAppointments: number; approved: number; cancelled: number; appointments: any[]; allDoctors: any[]; allServices: any[] }) {
   const completedAppointments = appointments.filter((a: any) => a.status === "completed");
   const totalRevenue = completedAppointments.reduce((sum: number, a: any) => sum + a.doctor.fees, 0);
-  
-  // Get recent appointments
   const recentAppointments = [...appointments].reverse().slice(0, 5);
-
-  // Get specialty distribution
   const specialtyCount: Record<string, number> = {};
   allDoctors.forEach((doc: any) => {
     specialtyCount[doc.specialty] = (specialtyCount[doc.specialty] || 0) + 1;
@@ -90,7 +87,6 @@ function HomeTab({ totalAppointments, approved, cancelled, appointments, allDoct
 
   return (
     <div className="space-y-8">
-      {/* Stats Cards */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <div className="flex items-center gap-4">
@@ -118,7 +114,6 @@ function HomeTab({ totalAppointments, approved, cancelled, appointments, allDoct
         </div>
       </div>
 
-      {/* Overview Cards */}
       <div className="grid gap-6 sm:grid-cols-3">
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
@@ -148,7 +143,6 @@ function HomeTab({ totalAppointments, approved, cancelled, appointments, allDoct
         </div>
       </div>
 
-      {/* Doctor Specialty Distribution */}
       <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold text-foreground">Doctors by Specialty</h3>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -161,7 +155,6 @@ function HomeTab({ totalAppointments, approved, cancelled, appointments, allDoct
         </div>
       </div>
 
-      {/* Recent Appointments */}
       <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold text-foreground">Recent Appointments</h3>
         {recentAppointments.length === 0 ? (
@@ -197,7 +190,7 @@ function HomeTab({ totalAppointments, approved, cancelled, appointments, allDoct
   );
 }
 
-function AllDoctorsTab({ doctors, onRemove }: { doctors: any[]; onRemove: (id: string) => void }) {
+function AllDoctorsTab({ doctors, onRemove, onToggleAvailability }: { doctors: any[]; onRemove: (id: string) => void; onToggleAvailability: (id: string) => void }) {
   return (
     <div>
       <h2 className="mb-6 text-xl font-bold text-foreground">All Doctors ({doctors.length})</h2>
@@ -213,6 +206,14 @@ function AllDoctorsTab({ doctors, onRemove }: { doctors: any[]; onRemove: (id: s
               <p className="text-sm text-muted-foreground">{doc.degree} • {doc.experience}</p>
               <p className="text-sm text-muted-foreground">₹{doc.fees}/visit</p>
               <p className="text-xs text-muted-foreground mt-1">{doc.email}</p>
+              <div className="mt-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Switch checked={doc.available} onCheckedChange={() => onToggleAvailability(doc.id)} />
+                  <span className={`text-xs font-medium ${doc.available ? "text-green-600" : "text-red-500"}`}>
+                    {doc.available ? "Available" : "Unavailable"}
+                  </span>
+                </div>
+              </div>
               <Button variant="outline" size="sm" onClick={() => onRemove(doc.id)} className="mt-3 w-full text-destructive hover:bg-destructive/10">
                 <Trash2 className="mr-1 h-3 w-3" /> Remove
               </Button>
@@ -265,7 +266,6 @@ function AddDoctorTab({ onAdd, onDone }: { onAdd: (doc: any) => void; onDone: ()
     <div className="mx-auto max-w-2xl">
       <h2 className="mb-6 text-xl font-bold text-foreground">Add New Doctor</h2>
       <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6">
-        {/* Photo Upload */}
         <div>
           <Label>Doctor Photo *</Label>
           <div className="mt-2 flex items-center gap-4">
@@ -286,7 +286,6 @@ function AddDoctorTab({ onAdd, onDone }: { onAdd: (doc: any) => void; onDone: ()
             <p className="text-sm text-muted-foreground">Click to upload doctor's photo. JPG, PNG supported.</p>
           </div>
         </div>
-
         <div className="grid gap-4 sm:grid-cols-2">
           <div><Label>Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
           <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /></div>
@@ -317,7 +316,7 @@ function AddDoctorTab({ onAdd, onDone }: { onAdd: (doc: any) => void; onDone: ()
   );
 }
 
-function AllServicesTab({ services, onRemove }: { services: any[]; onRemove: (id: string) => void }) {
+function AllServicesTab({ services, onRemove, onToggleAvailability }: { services: any[]; onRemove: (id: string) => void; onToggleAvailability: (id: string) => void }) {
   return (
     <div>
       <h2 className="mb-6 text-xl font-bold text-foreground">All Services ({services.length})</h2>
@@ -329,6 +328,14 @@ function AllServicesTab({ services, onRemove }: { services: any[]; onRemove: (id
               <h3 className="font-semibold text-foreground">{srv.name}</h3>
               <p className="text-sm text-muted-foreground line-clamp-2">{srv.description}</p>
               <p className="mt-2 text-sm font-semibold text-foreground">₹{srv.price} • {srv.duration}</p>
+              <div className="mt-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Switch checked={srv.available} onCheckedChange={() => onToggleAvailability(srv.id)} />
+                  <span className={`text-xs font-medium ${srv.available ? "text-green-600" : "text-red-500"}`}>
+                    {srv.available ? "Available" : "Unavailable"}
+                  </span>
+                </div>
+              </div>
               <Button variant="outline" size="sm" onClick={() => onRemove(srv.id)} className="mt-3 w-full text-destructive hover:bg-destructive/10">
                 <Trash2 className="mr-1 h-3 w-3" /> Remove
               </Button>
@@ -372,7 +379,6 @@ function AddServiceTab({ onAdd, onDone }: { onAdd: (srv: any) => void; onDone: (
     <div className="mx-auto max-w-2xl">
       <h2 className="mb-6 text-xl font-bold text-foreground">Add New Service</h2>
       <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6">
-        {/* Image Upload */}
         <div>
           <Label>Service Image *</Label>
           <div className="mt-2 flex items-center gap-4">
@@ -393,7 +399,6 @@ function AddServiceTab({ onAdd, onDone }: { onAdd: (srv: any) => void; onDone: (
             <p className="text-sm text-muted-foreground">Click to upload service image. JPG, PNG supported.</p>
           </div>
         </div>
-
         <div><Label>Service Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></div>
         <div><Label>Description</Label><Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required /></div>
         <div className="grid gap-4 sm:grid-cols-2">
