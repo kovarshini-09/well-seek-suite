@@ -32,10 +32,10 @@ export default function DoctorDashboard() {
   const earnings = getDoctorEarnings(loggedInDoctor.id);
 
   const handleStatusChange = (aptId, status) => {
-    updateAppointmentStatus(aptId, status as "pending" | "completed" | "cancelled");
+    updateAppointmentStatus(aptId, status);
   };
 
-  const tabs: { key: DoctorTab; label: string; icon: React.ReactNode }[] = [
+  const tabs = [
     { key: "appointments", label: "Appointments", icon: <CalendarDays className="h-4 w-4" /> },
     { key: "profile", label: "Profile", icon: <User className="h-4 w-4" /> },
   ];

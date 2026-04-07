@@ -24,7 +24,7 @@ export default function AdminDashboard() {
   const approved = appointments.filter((a) => a.status === "upcoming" || a.status === "completed").length;
   const cancelled = appointments.filter((a) => a.status === "cancelled").length;
 
-  const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
+  const tabs = [
     { key: "home", label: "Home", icon: <ShieldCheck className="h-4 w-4" /> },
     { key: "all-doctors", label: "All Doctors", icon: <Users className="h-4 w-4" /> },
     { key: "add-doctor", label: "Add Doctor", icon: <Stethoscope className="h-4 w-4" /> },
