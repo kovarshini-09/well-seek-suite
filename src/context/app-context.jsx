@@ -99,7 +99,7 @@ export function AppProvider({ children }) {
     setAppointments((prev) => prev.map((apt) => (apt.id === id ? { ...apt, status: "cancelled" } : apt)));
   };
 
-  const updateAppointmentStatus = (id, status: "pending" | "completed" | "cancelled") => {
+  const updateAppointmentStatus = (id, status) => {
     setAppointments((prev) => prev.map((apt) => (apt.id === id ? { ...apt, status } : apt)));
   };
 
