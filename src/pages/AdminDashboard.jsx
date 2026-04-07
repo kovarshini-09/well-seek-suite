@@ -230,7 +230,7 @@ function AddDoctorTab({ onAdd, onDone }) {
   const [imagePreview, setImagePreview] = useState("");
   const fileInputRef = useRef(null);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -243,7 +243,7 @@ function AddDoctorTab({ onAdd, onDone }) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.image) {
       alert("Please upload a photo of the doctor");
@@ -350,7 +350,7 @@ function AddServiceTab({ onAdd, onDone }) {
   const [imagePreview, setImagePreview] = useState("");
   const fileInputRef = useRef(null);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -363,7 +363,7 @@ function AddServiceTab({ onAdd, onDone }) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.image) {
       alert("Please upload an image for the service");

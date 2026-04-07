@@ -6,11 +6,7 @@ import { cn } from "@/lib/utils";
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" };
 
-export type ChartConfig = {
-  [k in string]: {
-    label?: React.ReactNode;
-    icon?: React.ComponentType;
-  } & ({ color?: string; theme?: never } | { color?: never; theme: Record<keyof typeof THEMES, string> });
+& ({ color?; theme?: never } | { color?; theme: Record<keyof typeof THEMES, string> });
 };
 
 const ChartContext = React.createContext(null);
@@ -25,11 +21,9 @@ function useChart() {
   return context;
 }
 
-const ChartContainer = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<"div"> & {
+const ChartContainer = React.forwardRef & {
     config: ChartConfig;
-    children: React.ComponentProps<typeof RechartsPrimitive.ResponsiveContainer>["children"];
+    children["children"];
   }
 >(({ id, className, children, config, ...props }, ref) => {
   const uniqueId = React.useId();
@@ -71,7 +65,7 @@ ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
     const color = itemConfig.theme?.[theme typeof itemConfig.theme] || itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
+    return color ? `  --color-${key}: ${color};` ;
   })
   .join("\n")}
 }
@@ -85,15 +79,13 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
-const ChartTooltipContent = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-    React.ComponentProps<"div"> & {
-      hideLabel?: boolean;
-      hideIndicator?: boolean;
+const ChartTooltipContent = React.forwardRef &
+    React.ComponentProps & {
+      hideLabel?;
+      hideIndicator?;
       indicator?: "line" | "dot" | "dashed";
-      nameKey?: string;
-      labelKey?: string;
+      nameKey?;
+      labelKey?;
     }
 >(
   (
@@ -223,12 +215,10 @@ ChartTooltipContent.displayName = "ChartTooltip";
 
 const ChartLegend = RechartsPrimitive.Legend;
 
-const ChartLegendContent = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<"div"> &
+const ChartLegendContent = React.forwardRef &
     Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
-      hideIcon?: boolean;
-      nameKey?: string;
+      hideIcon?;
+      nameKey?;
     }
 >(({ className, hideIcon = false, payload, verticalAlign = "bottom", nameKey }, ref) => {
   const { config } = useChart();
@@ -279,7 +269,7 @@ function getPayloadConfigFromPayload(config: ChartConfig, payload: unknown, key)
   const payloadPayload =
     "payload" in payload && typeof payload.payload === "object" && payload.payload !== null
       ? payload.payload
-      : undefined;
+      ;
 
   let configLabelKey= key;
 
